@@ -1,0 +1,40 @@
+{
+  "name": "memson",
+  "version": "0.2.2",
+  "description": "node library for memson",
+  "main": "index.js",
+  "scripts": {
+    "eslint": "eslint \"./**/*.js\"",
+    "eslint:fix": "eslint --fix \"./**/*.js\"",
+    "test": "mocha test",
+    "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/inmemlab/memson-node.git"
+  },
+  "keywords": [
+    "memson"
+  ],
+  "author": "memson, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/inmemlab/memson-node/issues"
+  },
+  "homepage": "https://github.com/inmemlab/memson-node#readme",
+  "dependencies": {
+    "@runkit/value-viewer": "^1.0.0",
+    "axios": "^0.19.0",
+    "do-wrapper": "^3.22.1",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.5.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jsdoc": "^3.6.3",
+    "minami": "^1.2.3",
+    "mocha": "^6.2.0",
+    "prettier": "^1.18.2"
+  }
+}
