@@ -1,5 +1,5 @@
 {
-  "name": "memson",
+  "name": "@memson/memson",
   "version": "0.2.2",
   "description": "node library for memson",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "eslint": "eslint \"./**/*.js\"",
     "eslint:fix": "eslint --fix \"./**/*.js\"",
     "test": "mocha test",
-    "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
+    "docs": "jsdoc --configure .jsdoc.json --verbose"
   },
   "repository": {
     "type": "git",
@@ -34,5 +34,8 @@
     "minami": "^1.2.3",
     "mocha": "^6.2.0",
     "prettier": "^1.18.2"
+  },
+  "directories": {
+    "test": "test"
   }
 }

@@ -1,9 +1,7 @@
 /* eslint-disable prettier/prettier */
-const { Memson } = require('./index.js');
+const memson = require('./index.js')('localhost:8686');
 
 console.log('Welcome to memson client!');
-
-const memson = Memson('http://localhost:8686/');
 
 async function evalCmd(cmd) {
   const result = await memson.eval(cmd);
