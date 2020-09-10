@@ -1,74 +1,117 @@
-const { memson } = require("./index.js");
+/* eslint-disable prettier/prettier */
+const { Memson } = require('./index.js');
 
-console.log("Welcome to memson client!");
+console.log('Welcome to memson client!');
 
-const memson = memson("https://memson-demo.herokuapp.com");
+const memson = Memson('http://localhost:8686/');
+
+async function evalCmd(cmd) {
+  const result = await memson.eval(cmd);
+  console.log(JSON.stringify(result, null, 1));
+  console.log(result);
+}
+
+async function query(cmd) {
+  cmd = { query: cmd };
+  const result = await memson.eval(cmd);
+  console.log(JSON.stringify(cmd, null, 1));
+  console.log(result);
+}
 
 const main = async () => {
-    try {
-        let result = await memson.summary();
+  try {
+    console.log('inserting data');
+    
+    /*
+    await memson.set('orders', [
+      { customer: 'james', qty: 2, price: 9.0, discount: 10 },
+      { customer: 'ania', qty: 2, price: 2.0 },
+      { customer: 'misha', qty: 4, price: 1.0 },
+      { customer: 'james', qty: 10, price: 16.0, discount: 20 },
+      { customer: 'james', qty: 1, price: 16.0 },
+    ]
+    );
+    await memson.set('x', 1);
+    await memson.set('y', 2);
+    await memson.set('james', { name: 'james perry', age: 30 });
+    */
+    const examples = [
+      {add: [1, 2]},
+      {add: ["bob", 2]},
+      {add: [3, "bob"]},
+      {add: [[1,2,3,4,5], 1]}
+    ];
+    examples.forEach(async cmd => {
+      await evalCmd(cmd);
+    });
+    console.log('Summary:');
+    console.log(await memson.summary());
 
-        console.log("Summary:");
-        console.log(result);
+    const cmds = [
 
-        result = await memson.set({
-            name: "orders",
-            columns: [
-                { name: "time", type: "time" },
-                { name: "qty", type: "int" },
-                { name: "price", type: "float" }
-            ],
-            recreate: true
-        });
-
-        console.log("\nTable 'orders' (re)created:");
-        console.log(result);
-
-        result = await memson.insert({
-            name: "orders",
-            rows: [
-                { time: "00:00:00", qty: 2, price: 9.0 },
-                { time: "00:30:09", qty: 2, price: 2.0 },
-                { time: "01:45:01", qty: 4, price: 1.0 },
-                { time: "12:10:33", qty: 10, price: 16.0 },
-                { time: "16:00:09", qty: 4, price: 8.0 },
-                { time: "22:00:00", qty: 4, price: 23.0 },
-                { time: "22:31:49", qty: 4, price: 45.0 },
-                { time: "22:59:19", qty: 4, price: 17.0 }
-            ]
-        });
-        console.log(`\nInserted ${result} rows`);
-
-        result = await memson.query({
-            select: ["time", "qty", "price"],
-            from: "orders"
-        });
-
-        console.log("\nSelect 'time', 'qty' and 'price' columns from 'orders' table:");
-        console.log(result);
-
-        result = await memson.query({
-            select: [{ count: "price" }, { sum: "qty" }],
-            by: { bar: ["time", { time: [1, 0, 0] }] },
-            from: "orders"
-        });
-
-        console.log(
-            "\nSelect 'count(time)', 'sum(qty)' by 'time(1, 0, 0)' buckets of 'time' column from 'orders' table:"
-        );
-        console.log(result);
-
-        result = await memson.delete("orders");
-
-        console.log(`\nDeleted 'orders' table: ${result}`);
-
-        result = await memson.summary();
-
-        console.log("Summary:");
-        console.log(result);
-    } catch (e) {
-        console.error(e);
+      { key: 'orders' },
+      { key: 'x' },
+      { key: 'y' },
+      { key: 'james' },
+      { get: ['price', { key: 'orders' }]},
+      { key: 'orders.qty' },
+      { mul: [{ key: 'orders.price' }, { key: 'orders.qty' }] },
+      { sum: { key: 'orders.qty' } },
+      { '+': [{ key: 'orders.customer' }, ' doe'] },
+      { unique: { key: 'orders.customer' } },
+      { key: 'x' },
+      { key: 'y' },
+      { key: 'orders' },
+      //{ append: ['james', { email: 'james@memson.io' }] },
+      { key: 'james' }
+    ];
+    for (let i = 0; i < cmds.length; i++) {
+      await evalCmd(cmds[i]);
     }
+
+    const queries = [
+      { from: 'orders' },
+      { select: { name: { key: 'customer' } }, from: 'orders' },
+      { select: { volume: { sum: { key: 'qty' } } }, from: 'orders' },
+      { select: { highestQty: { max: { key: 'qty' } } }, from: 'orders' },
+      {
+        select: {
+          highestQty: { max: { key: 'qty' } },
+          lowestQty: { min: { key: 'qty' } },
+        },
+        from: 'orders'
+      },
+      {
+        select: {
+          name: { key: 'customer' },
+          orderQty: { key: 'qty' },
+        },
+        from: 'orders'
+      },
+      {
+        select: {
+          orderPrice: {key: 'price'},
+          orderQty: {key: 'qty'},
+        },
+        by: 'customer',
+        from: 'orders'
+      },
+      {
+        select: {
+          highestPrice: { max: { key: 'price'} },
+          lowestQty: { min: { key: 'qty'} },
+        },
+        by: 'customer',
+        from: 'orders'
+      }
+    ];
+    for (let i = 0; i < queries.length; i++) {
+      await query(queries[i]);
+    }
+  }
+  catch (e) {
+    console.error(e);
+  }
 };
 
 main();
